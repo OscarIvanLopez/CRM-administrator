@@ -1,15 +1,16 @@
-const { ApolloServer } = require('apollo-server');
-const typeDefs = require('./db/schema.graphQL');
-const resolvers = require('./db/resolvers');
+const { ApolloServer } = require("apollo-server");
+const typeDefs = require("./db/schema.graphQL");
+const resolvers = require("./db/resolvers.js");
 
-// servidor
+
+
+//servidor
 const server = new ApolloServer({
     typeDefs,
     resolvers
 });
 
-
-// Arracar el servidor
+//arrancar el servidor
 server.listen().then(({ url }) => {
-    console.log(`Sevidor listo en la URL: ${url}`);
-})
+    console.log(`Servidor en el puerto ${url}`);
+});
