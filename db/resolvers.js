@@ -26,6 +26,16 @@ const resolvers = {
         console.log(error);
       }
     },
+    obtenerProducto: async (_, { id }) => {
+      // Revisar si el producto existe o no
+      const producto = Producto.findById(id);
+
+      if (!producto) {
+        throw new Error("El producto no existe");
+      }
+
+      return producto;
+    },
   },
 
   Mutation: {
@@ -87,6 +97,16 @@ const resolvers = {
       } catch (error) {
         console.log(error);
       }
+    },
+    actualizarProducto: async (_, { id, input }) => {
+      let producto = new Producto.findById(id);
+
+      if (!producto) {
+        throw new Error("El producto no existe");
+      }
+
+      //! Si el producto si existe lo pasamos a la base de datos
+      producto = await Producto.findOneAndUpdate({ _id: id });
     },
   },
 };
