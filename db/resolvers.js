@@ -1,5 +1,6 @@
 const Usuario = require("../models/Usuario");
 const Producto = require("../models/Producto");
+const Cliente = require("../models/Clientes");
 const bcryptjs = require("bcryptjs");
 require("dotenv").config({ path: "variables.env" });
 const jwt = require("jsonwebtoken");
@@ -9,8 +10,6 @@ const crearToken = (usuario, secreta, expiresIn) => {
   const { id, email, nombre, apellido } = usuario;
   return jwt.sign({ id, email, nombre, apellido }, secreta, { expiresIn });
 };
-
-
 
 //resolvers
 const resolvers = {
@@ -37,6 +36,14 @@ const resolvers = {
       }
 
       return producto;
+    },
+    obtenerClientes: async () => {
+      try {
+        const clientes = await Cliente.find({});
+        return clientes;
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
 
@@ -126,6 +133,33 @@ const resolvers = {
 
       return "Producto Eliminado";
     },
+    nuevoCliente: async (_, { input }, ctx) => {
+      console.log(ctx);
+
+      //destructuring
+      const { email } = input;
+
+      //* verificar si el cliente ya esta regitrado
+
+      const cliente = await Cliente.findOne({ email });
+
+      if (cliente) {
+        throw new Error("El cliente ya esta registrado");
+      }
+
+      const nuevoCliente = new Cliente(input);
+      //* Asignar el vendeor
+      nuevoCliente.vendedor = ctx.usuario.id;
+
+      try {
+        // guardarlo en la base de datos
+        const resultado = await nuevoCliente.save();
+        return resultado;
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
 };
+
 module.exports = resolvers;
