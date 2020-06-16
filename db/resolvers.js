@@ -10,6 +10,8 @@ const crearToken = (usuario, secreta, expiresIn) => {
   return jwt.sign({ id, email, nombre, apellido }, secreta, { expiresIn });
 };
 
+
+
 //resolvers
 const resolvers = {
   Query: {
@@ -99,14 +101,30 @@ const resolvers = {
       }
     },
     actualizarProducto: async (_, { id, input }) => {
-      let producto = new Producto.findById(id);
+      let producto = await Producto.findById(id);
+
+      if (!producto) {
+        throw new Error("El usuario no existe");
+      }
+
+      //! Si el producto si existe lo pasamos a la base de datos
+      producto = await Producto.findOneAndUpdate({ _id: id }, input, {
+        new: true,
+      });
+
+      return producto;
+    },
+    eliminarProducto: async (_, { id }) => {
+      const producto = Producto.findById(id);
 
       if (!producto) {
         throw new Error("El producto no existe");
       }
 
-      //! Si el producto si existe lo pasamos a la base de datos
-      producto = await Producto.findOneAndUpdate({ _id: id });
+      //! Eliminar el producto
+      await Producto.findByIdAndDelete({ _id: id });
+
+      return "Producto Eliminado";
     },
   },
 };
