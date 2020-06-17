@@ -4,7 +4,6 @@ const Cliente = require("../models/Clientes");
 const bcryptjs = require("bcryptjs");
 require("dotenv").config({ path: "variables.env" });
 const jwt = require("jsonwebtoken");
-const Clientes = require("../models/Clientes");
 
 const crearToken = (usuario, secreta, expiresIn) => {
   console.log(usuario);
@@ -48,11 +47,27 @@ const resolvers = {
     },
     obtenerClientesVendedor: async (_, {}, ctx) => {
       try {
-        const clientes = await Cliente.find({vendedor: ctx.usuario.id.toString()});
+        const clientes = await Cliente.find({
+          vendedor: ctx.usuario.id.toString(),
+        });
         return clientes;
       } catch (error) {
         console.log(error);
       }
+    },
+    obtenerCliente: async (_, { id }, ctx) => {
+      //Revisar si el cliente existe o no
+      const cliente = await Cliente.findById(id);
+
+      if (!cliente) {
+        throw new Error("Cliente no encontrado");
+      }
+
+      //Quien lo creo puede verla
+      if (cliente.vendedor.toString() !== ctx.usuario.id) {
+        throw new Error("Este cliente no te corresponde");
+      }
+      return cliente;
     },
   },
 
@@ -123,7 +138,7 @@ const resolvers = {
         throw new Error("El usuario no existe");
       }
 
-      //! Si el producto si existe lo pasamos a la base de datos
+      // Si el producto si existe lo pasamos a la base de datos
       producto = await Producto.findOneAndUpdate({ _id: id }, input, {
         new: true,
       });
@@ -167,6 +182,39 @@ const resolvers = {
       } catch (error) {
         console.log(error);
       }
+    },
+    actualizarCliente: async (_, { id, input }, ctx) => {
+      //verificar si existe o no
+      let cliente = await Cliente.findById(id);
+      if (!cliente) {
+        throw new Error("Ese cliente no existe");
+      }
+      //verificar si el vendedor es el que edita
+      if (cliente.vendedor.toString() !== ctx.usuario.id) {
+        throw new Error("Este cliente no te corresponde");
+      }
+      //guardar el cliente
+      cliente = await Cliente.findOneAndUpdate({ _id: id }, input, {
+        new: true,
+      });
+      return cliente;
+    },
+    eliminarCliente: async (_, { id }, ctx) => {
+      const cliente = await Cliente.findById(id);
+
+      if (!cliente) {
+        throw new Error("El cliente no existe");
+      }
+
+      if (cliente.vendedor.toString() !== ctx.usuario.id) {
+        throw new Error("El cliente no te corresponde");
+      }
+
+      //! Eliminar el cliente
+
+      await Cliente.findOneAndDelete({ _id: id });
+
+      return "Cliente eliminado";
     },
   },
 };
