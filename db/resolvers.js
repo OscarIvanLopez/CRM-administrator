@@ -4,6 +4,7 @@ const Cliente = require("../models/Clientes");
 const bcryptjs = require("bcryptjs");
 require("dotenv").config({ path: "variables.env" });
 const jwt = require("jsonwebtoken");
+const Clientes = require("../models/Clientes");
 
 const crearToken = (usuario, secreta, expiresIn) => {
   console.log(usuario);
@@ -40,6 +41,14 @@ const resolvers = {
     obtenerClientes: async () => {
       try {
         const clientes = await Cliente.find({});
+        return clientes;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    obtenerClientesVendedor: async (_, {}, ctx) => {
+      try {
+        const clientes = await Cliente.find({vendedor: ctx.usuario.id.toString()});
         return clientes;
       } catch (error) {
         console.log(error);
