@@ -227,7 +227,21 @@ const resolvers = {
       if (clienteExiste.vendedor.toString() !== ctx.usuario.id) {
         throw new Error("Este cliente no te corresponde");
       }
+
       //Revisar si el stock esta disponible
+      for await (const articulo of input.pedido) {
+        const { id } = articulo;
+
+        const producto = await Producto.findById(id);
+
+        if (articulo.cantidad > producto.existencia) {
+          throw new Error(
+            `El articulo: ${producto.nombre} excede la cantidad disponible`
+          );
+        }
+      }
+      //!te falta lo siguiente!!!!
+      //crear un nuevo pedido
       //Asignarle un vendedor
       //Guardar en la base de datos
     },
