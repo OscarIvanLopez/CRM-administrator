@@ -1,6 +1,6 @@
 const Usuario = require("../models/Usuario");
 const Producto = require("../models/Producto");
-const Cliente = require("../models/Clientes");
+const Cliente = require("../models/Cliente");
 const bcryptjs = require("bcryptjs");
 require("dotenv").config({ path: "variables.env" });
 const jwt = require("jsonwebtoken");
@@ -158,8 +158,6 @@ const resolvers = {
       return "Producto Eliminado";
     },
     nuevoCliente: async (_, { input }, ctx) => {
-      console.log(ctx);
-
       //destructuring
       const { email } = input;
 
@@ -215,6 +213,23 @@ const resolvers = {
       await Cliente.findOneAndDelete({ _id: id });
 
       return "Cliente eliminado";
+    },
+    nuevoPedido: async (_, { input }, ctx) => {
+      const { cliente } = input;
+
+      //Verificar si el cliente exite o no
+      const clienteExiste = await Cliente.findById(cliente);
+      if (!clienteExiste) {
+        throw new Error("El cliente no existe");
+      }
+
+      //Verificar si el cliente es del vendedor
+      if (clienteExiste.vendedor.toString() !== ctx.usuario.id) {
+        throw new Error("Este cliente no te corresponde");
+      }
+      //Revisar si el stock esta disponible
+      //Asignarle un vendedor
+      //Guardar en la base de datos
     },
   },
 };
