@@ -240,7 +240,6 @@ const resolvers = {
           );
         }
       }
-      //!te falta lo siguiente!!!!
       //crear un nuevo pedido
       //Asignarle un vendedor
       //Guardar en la base de datos
