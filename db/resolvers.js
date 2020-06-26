@@ -112,6 +112,26 @@ const resolvers = {
 
       return pedidos;
     },
+    mejoresClientes: async () => {
+      const cliente = await Pedido.aggregate([
+        { $match: { estado: "COMPLETADO" } },
+        {
+          $group: {
+            _id: "$cliente",
+            total: { $sum: "$total" },
+          },
+        },
+        {
+          $lookup: {
+            from: "clientes",
+            localField: "_id",
+            foreingField: "_id",
+            as: "cliente",
+          },
+        },
+      ]);
+      return cliente;
+    },
   },
 
   Mutation: {
