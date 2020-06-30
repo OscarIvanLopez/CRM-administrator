@@ -12,7 +12,7 @@ const crearToken = (usuario, secreta, expiresIn) => {
   const { id, email, nombre, apellido } = usuario;
   return jwt.sign({ id, email, nombre, apellido }, secreta, { expiresIn });
 };
-
+//comment
 //resolvers
 const resolvers = {
   Query: {
