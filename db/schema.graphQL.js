@@ -49,7 +49,7 @@ const typeDefs = gql`
 
   type TopCliente {
     total: Float
-    cantidad: Int
+    cliente: [Cliente]
   }
 
   input UsuarioInput {

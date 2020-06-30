@@ -125,9 +125,12 @@ const resolvers = {
           $lookup: {
             from: "clientes",
             localField: "_id",
-            foreingField: "_id",
+            foreignField: "_id",
             as: "cliente",
           },
+        },
+        {
+          $sort: { total: -1 },
         },
       ]);
       return cliente;
